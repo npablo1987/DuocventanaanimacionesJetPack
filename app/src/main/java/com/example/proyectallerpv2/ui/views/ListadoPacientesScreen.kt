@@ -12,6 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.proyectallerpv2.model.Paciente
 import com.example.proyectallerpv2.repository.PacienteRepository
+import com.example.proyectallerpv2.ui.views.animation.LottieLoader
+
+import kotlinx.coroutines.delay // Para simular una espera en LaunchedEffect
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,9 +28,29 @@ fun ListadoPacientesScreen(
     // Estado con la lista de pacientes del repositorio
     var pacientes by remember { mutableStateOf(repository.obtenerTodosPacientes()) }
 
+    // Estado que indica si estamos "cargando" información
+    //**** NUEVO
+    var estaCargando by remember { mutableStateOf(true) }
+
+    //**** NUEVO
+    // Mensaje que se mostrará junto al indicador de carga
+    var mensajeCarga by remember { mutableStateOf("Cargando pacientes...") }
+
+
     // Actualizamos la lista cada vez que entramos a la pantalla
     LaunchedEffect(Unit) {
+        mensajeCarga = "Cargando pacientes..." //NUEVO *****
+
+        estaCargando = true//NUEVO *****
+
+        delay(5000)//NUEVO *****
+
         pacientes = repository.obtenerTodosPacientes()
+
+
+        // Apagamos el indicador de carga
+        estaCargando = false//NUEVO *****
+
     }
 
     Scaffold(
@@ -49,7 +73,17 @@ fun ListadoPacientesScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            if (pacientes.isEmpty()) {
+
+            // 1) Si estamos cargando, mostramos el indicador de progreso
+            if (estaCargando) {
+                LottieLoader(
+                    modifier = Modifier.align(Alignment.Center),
+                    mensaje = mensajeCarga        // por ejemplo: "Cargando pacientes..."
+                )
+            } else {
+
+
+                if (pacientes.isEmpty()) {
                 // Si no hay pacientes mostramos un mensaje
                 Column(
                     modifier = Modifier.align(Alignment.Center),
@@ -101,7 +135,10 @@ fun ListadoPacientesScreen(
                             }
                         }
                     }
-                }
+                }//finsi existen pacientes!
+
+                }// fin espera
+
             }
         }
     }

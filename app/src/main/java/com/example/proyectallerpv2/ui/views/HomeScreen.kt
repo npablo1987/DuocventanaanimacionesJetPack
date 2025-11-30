@@ -57,7 +57,7 @@ fun HomeScreen(
                         )
                     }
                 }
-            )
+            )//dfin rio var
         }
     ) { paddingValues ->
         // Contenido principal de la pantalla Home
